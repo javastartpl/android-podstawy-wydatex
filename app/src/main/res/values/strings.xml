@@ -3,5 +3,8 @@
 
     <string name="app_name">Wydatex</string>
     <string name="hello_world">Hello world!</string>
+    <string name="add_new_expense">Dodaj nowy wydatek</string>
+    <string name="preferences">Ustawienia</string>
+    <string name="save">Zapisz</string>
 
 </resources>

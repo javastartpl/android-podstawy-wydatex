@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,10 +23,10 @@ public class ExpenseActivity extends Activity {
 
     private SharedPreferences sharedPreferences;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_expense);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_expense);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -36,19 +36,11 @@ public class ExpenseActivity extends Activity {
 
         categorySpinner.setAdapter(new CategoryAdapter());
 
-        if(shouldCareAboutLastCategory()) {
+        if (shouldCareAboutLastCategory()) {
             loadLastCategory(categorySpinner);
         }
         loadDefaultValues();
-
-		Button newExpenseButton = (Button) findViewById(R.id.add_expense);
-		newExpenseButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-                addNewExpense();
-			}
-		});
-	}
+    }
 
     private boolean shouldCareAboutLastCategory() {
         return sharedPreferences.getBoolean("pref_save_category", false);
@@ -57,7 +49,7 @@ public class ExpenseActivity extends Activity {
     private void loadLastCategory(Spinner categorySpinner) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String lastCategoryName = prefs.getString(PREF_LAST_CATEGORY, "");
-        if(!lastCategoryName.isEmpty()) {
+        if (!lastCategoryName.isEmpty()) {
             int id = ExpenseCategory.getId(lastCategoryName);
             categorySpinner.setSelection(id);
         }
@@ -65,7 +57,7 @@ public class ExpenseActivity extends Activity {
 
     private void loadDefaultValues() {
         boolean defaultValues = sharedPreferences.getBoolean("pref_default_values", false);
-        if(defaultValues) {
+        if (defaultValues) {
             String defaultName = sharedPreferences.getString("pref_default_name", "");
             String defaultPrice = sharedPreferences.getString("pref_default_price", "9.99");
 
@@ -81,7 +73,7 @@ public class ExpenseActivity extends Activity {
         Expense expense = new Expense(title, price, category);
         ExpenseDatabase.addExpense(expense);
 
-        if(shouldCareAboutLastCategory()) {
+        if (shouldCareAboutLastCategory()) {
             saveLastCategory(category);
         }
 
@@ -113,7 +105,7 @@ public class ExpenseActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null) {
+            if (convertView == null) {
                 convertView = getLayoutInflater().inflate(android.R.layout.simple_spinner_item, null);
             }
 
@@ -124,4 +116,20 @@ public class ExpenseActivity extends Activity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.expense_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.save:
+                addNewExpense();
+                return true;
+            default:
+                return super.onMenuItemSelected(featureId, item);
+        }
+    }
 }
