@@ -1,13 +1,25 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.github.stephanenicolas.ormgap:ormgap-plugin:1.0.7'
+    }
+}
+
 apply plugin: 'com.android.application'
+apply plugin: 'ormgap'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "20.0.0"
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "pl.javastart.wydatex"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 22
     }
 
     buildTypes {
@@ -19,5 +31,5 @@ android {
 }
 
 dependencies {
-
+    compile 'com.j256.ormlite:ormlite-android:4.48'
 }

@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import pl.javastart.wydatex.database.ExpenseRepository;
+
 public class ExpenseListActivity extends Activity {
 
     private ListView expenseListView;
@@ -34,12 +36,12 @@ public class ExpenseListActivity extends Activity {
 
         @Override
         public int getCount() {
-            return ExpenseDatabase.getExpenses().size();
+            return ExpenseRepository.getAllExpenses(ExpenseListActivity.this).size();
         }
 
         @Override
         public Expense getItem(int position) {
-            return ExpenseDatabase.getExpenses().get(position);
+            return ExpenseRepository.getAllExpenses(ExpenseListActivity.this).get(position);
         }
 
         @Override

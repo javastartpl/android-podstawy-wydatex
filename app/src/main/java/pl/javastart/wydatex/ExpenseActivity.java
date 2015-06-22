@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import pl.javastart.wydatex.database.ExpenseRepository;
+
 public class ExpenseActivity extends Activity {
 
     private static final String PREF_LAST_CATEGORY = "pref.last.category";
@@ -71,7 +73,7 @@ public class ExpenseActivity extends Activity {
         double price = Double.parseDouble(priceEditText.getText().toString());
         ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
         Expense expense = new Expense(title, price, category);
-        ExpenseDatabase.addExpense(expense);
+        ExpenseRepository.addExpense(this, expense);
 
         if (shouldCareAboutLastCategory()) {
             saveLastCategory(category);

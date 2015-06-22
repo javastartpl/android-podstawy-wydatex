@@ -1,10 +1,27 @@
 package pl.javastart.wydatex;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
+@DatabaseTable(tableName = "expense")
 public class Expense {
 
+    @DatabaseField(generatedId = true)
+    private Long id;
+
+    @DatabaseField
     private String name;
+
+    @DatabaseField
     private double price;
+
+    @DatabaseField
     private ExpenseCategory category;
+
+
+    @SuppressWarnings("unused")
+    public Expense() {
+    }
 
     public Expense(String name, double price, ExpenseCategory category) {
         this.name = name;
