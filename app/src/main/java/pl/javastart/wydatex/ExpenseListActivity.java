@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +25,14 @@ public class ExpenseListActivity extends Activity {
 
         expenseListView = (ListView) findViewById(R.id.listView);
         expenseListView.setAdapter(new ExpenseListAdapter());
+        expenseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ExpenseListActivity.this, ExpenseActivity.class);
+                intent.putExtra(ExpenseActivity.ID, id);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -46,7 +55,7 @@ public class ExpenseListActivity extends Activity {
 
         @Override
         public long getItemId(int position) {
-            return position;
+            return getItem(position).getId();
         }
 
         @Override

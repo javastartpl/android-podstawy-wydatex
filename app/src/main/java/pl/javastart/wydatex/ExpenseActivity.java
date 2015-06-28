@@ -13,15 +13,24 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import pl.javastart.wydatex.database.DatabaseHelper;
 import pl.javastart.wydatex.database.ExpenseRepository;
 
 public class ExpenseActivity extends Activity {
 
+    private enum State {NEW, EDIT}
+
     private static final String PREF_LAST_CATEGORY = "pref.last.category";
 
+    public static final int INVALID_ID = -1;
+    public static final String ID = "id";
+
+    private State state;
     private EditText titleEditText;
     private EditText priceEditText;
     private Spinner categorySpinner;
+
+    private Expense expense;
 
     private SharedPreferences sharedPreferences;
 
@@ -38,10 +47,29 @@ public class ExpenseActivity extends Activity {
 
         categorySpinner.setAdapter(new CategoryAdapter());
 
-        if (shouldCareAboutLastCategory()) {
-            loadLastCategory(categorySpinner);
+        long id = INVALID_ID;
+        if (getIntent().getExtras() != null) {
+            id = getIntent().getExtras().getLong(ID, INVALID_ID);
         }
-        loadDefaultValues();
+
+        if (id != INVALID_ID) {
+            // id zostało przekazane
+            state = State.EDIT;
+            expense = DatabaseHelper.getInstance(this).getExpenseDao().queryForId(id);
+            titleEditText.setText(expense.getName());
+            priceEditText.setText(Double.toString(expense.getPrice()));
+            categorySpinner.setSelection(ExpenseCategory.getId(expense.getCategory().getName()));
+        } else {
+            // id NIE zostało przekazane
+            state = State.NEW;
+        }
+
+        if (state == State.NEW) {
+            if (shouldCareAboutLastCategory()) {
+                loadLastCategory(categorySpinner);
+            }
+            loadDefaultValues();
+        }
     }
 
     private boolean shouldCareAboutLastCategory() {
@@ -66,26 +94,6 @@ public class ExpenseActivity extends Activity {
             titleEditText.setText(defaultName);
             priceEditText.setText(defaultPrice);
         }
-    }
-
-    private void addNewExpense() {
-        String title = titleEditText.getText().toString();
-        double price = Double.parseDouble(priceEditText.getText().toString());
-        ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
-        Expense expense = new Expense(title, price, category);
-        ExpenseRepository.addExpense(this, expense);
-
-        if (shouldCareAboutLastCategory()) {
-            saveLastCategory(category);
-        }
-
-        finish();
-    }
-
-    private void saveLastCategory(ExpenseCategory expenseCategory) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(PREF_LAST_CATEGORY, expenseCategory.name());
-        editor.commit();
     }
 
     private class CategoryAdapter extends BaseAdapter {
@@ -120,7 +128,12 @@ public class ExpenseActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.expense_menu, menu);
+        if (state == State.NEW) {
+            getMenuInflater().inflate(R.menu.add_expense_menu, menu);
+        }
+        if (state == State.EDIT) {
+            getMenuInflater().inflate(R.menu.edit_expense_menu, menu);
+        }
         return true;
     }
 
@@ -128,10 +141,45 @@ public class ExpenseActivity extends Activity {
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.save:
-                addNewExpense();
+                if (state == State.NEW) {
+                    addNewExpense();
+                } else {
+                    saveChanges();
+                }
+                finish();
+                return true;
+            case R.id.delete:
+                DatabaseHelper.getInstance(this).getExpenseDao().delete(expense);
+                finish();
                 return true;
             default:
                 return super.onMenuItemSelected(featureId, item);
         }
+    }
+
+    private void addNewExpense() {
+        String title = titleEditText.getText().toString();
+        double price = Double.parseDouble(priceEditText.getText().toString());
+        ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
+        Expense expense = new Expense(title, price, category);
+        ExpenseRepository.addExpense(this, expense);
+
+        if (state == State.NEW && shouldCareAboutLastCategory()) {
+            saveLastCategory(category);
+        }
+    }
+
+    private void saveLastCategory(ExpenseCategory expenseCategory) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(PREF_LAST_CATEGORY, expenseCategory.name());
+        editor.commit();
+    }
+
+
+    private void saveChanges() {
+        expense.setName(titleEditText.getText().toString());
+        expense.setPrice(Double.parseDouble(priceEditText.getText().toString()));
+        expense.setCategory((ExpenseCategory) categorySpinner.getSelectedItem());
+        DatabaseHelper.getInstance(this).getExpenseDao().update(expense);
     }
 }
