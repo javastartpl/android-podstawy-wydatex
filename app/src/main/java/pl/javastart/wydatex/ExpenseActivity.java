@@ -116,7 +116,7 @@ public class ExpenseActivity extends Activity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = getLayoutInflater().inflate(android.R.layout.simple_spinner_item, null);
+                convertView = getLayoutInflater().inflate(android.R.layout.simple_dropdown_item_1line, null);
             }
 
             TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
@@ -172,7 +172,7 @@ public class ExpenseActivity extends Activity {
     private void saveLastCategory(ExpenseCategory expenseCategory) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(PREF_LAST_CATEGORY, expenseCategory.name());
-        editor.commit();
+        editor.apply();
     }
 
 
