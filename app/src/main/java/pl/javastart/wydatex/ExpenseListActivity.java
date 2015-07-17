@@ -17,6 +17,7 @@ import pl.javastart.wydatex.database.ExpenseRepository;
 public class ExpenseListActivity extends Activity {
 
     private ListView expenseListView;
+    private ExpenseListAdapter expenseListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +25,8 @@ public class ExpenseListActivity extends Activity {
         setContentView(R.layout.activity_expense_list);
 
         expenseListView = (ListView) findViewById(R.id.listView);
-        expenseListView.setAdapter(new ExpenseListAdapter());
+        expenseListAdapter = new ExpenseListAdapter();
+        expenseListView.setAdapter(expenseListAdapter);
         expenseListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -39,7 +41,7 @@ public class ExpenseListActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        expenseListView.invalidateViews();
+        expenseListAdapter.notifyDataSetInvalidated();
     }
 
     private class ExpenseListAdapter extends BaseAdapter {
