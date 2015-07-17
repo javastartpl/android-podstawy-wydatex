@@ -33,6 +33,7 @@ public class ExpenseListActivity extends Activity {
                 startActivity(intent);
             }
         });
+        expenseListView.setEmptyView(findViewById(R.id.no_expenses));
     }
 
     @Override
