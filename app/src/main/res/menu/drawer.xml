@@ -4,18 +4,24 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/drawer_item_1"
-            android:icon="@drawable/ic_info"
+            android:icon="@drawable/ic_attach_money_white"
             android:title="Wydatki" />
         <item
             android:id="@+id/drawer_item_2"
-            android:icon="@drawable/ic_help"
+            android:icon="@drawable/ic_map_white"
             android:title="Miejsca" />
     </group>
 
-    <item android:title="@string/action_settings">
-        <menu>
-            <item android:title="@string/action_settings" android:id="@+id/drawer_settings"/>
-        </menu>
-    </item>
+    <group android:checkableBehavior="single">
+        <item android:title="@string/action_settings">
+            <menu>
+                <item
+                    android:id="@+id/drawer_settings"
+                    android:icon="@drawable/ic_settings_white"
+                    android:title="@string/action_settings" />
+            </menu>
+        </item>
+    </group>
+
 
 </menu>

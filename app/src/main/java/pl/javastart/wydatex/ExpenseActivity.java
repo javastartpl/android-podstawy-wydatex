@@ -1,6 +1,5 @@
 package pl.javastart.wydatex;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -15,10 +14,29 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+
 import pl.javastart.wydatex.database.DatabaseHelper;
 import pl.javastart.wydatex.database.ExpenseRepository;
 
-public class ExpenseActivity extends AppCompatActivity {
+public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap googleMap;
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setRotateGesturesEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.9976972, 19.2078602), 5));
+    }
 
     private enum State {NEW, EDIT}
 
@@ -44,7 +62,9 @@ public class ExpenseActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
@@ -77,6 +97,9 @@ public class ExpenseActivity extends AppCompatActivity {
             }
             loadDefaultValues();
         }
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private boolean shouldCareAboutLastCategory() {
@@ -139,7 +162,7 @@ public class ExpenseActivity extends AppCompatActivity {
             getMenuInflater().inflate(R.menu.add_expense_menu, menu);
         }
         if (state == State.EDIT) {
-            getMenuInflater().inflate(R.menu.edit_expense_menu, menu);
+            getMenuInflater().inflate(R.menu.menu_expense_edit, menu);
         }
         return true;
     }

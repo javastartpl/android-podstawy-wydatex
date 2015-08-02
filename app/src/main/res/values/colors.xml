@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,18 +17,27 @@
 <resources>
     <color name="window_background">#FFF5F5F5</color>
 
-  <color name="secondary">#8d3f00</color>
-  <color name="secondaryDark">#ff611c4b</color>
-  <color name="primary">#ff15a89c</color>
-  <color name="primaryDark">#ff147165</color>
-  <color name="ternary">#ff3b3b3a</color>
-  <color name="accent">#ffe3b008</color>
+    <color name="secondary">#8a000000</color>
+    <color name="secondaryDark">#ff611c4b</color>
+    <color name="primaryDark">#ff147165</color>
+    <color name="ternary">#ff3b3b3a</color>
 
-  <color name="primaryText">#de000000</color>
-  <color name="secondaryText">#8a000000</color>
+    <color name="primaryText">#de000000</color>
+    <color name="secondaryText">#8a000000</color>
 
-  <color name="drawer_header_bg">@color/secondary</color>
-  <color name="drawer_item_text_default">#bebebe</color>
-  <color name="drawer_item_text_checked">@color/primary</color>
+    <color name="drawer_header_bg">@color/secondary</color>
+    <color name="drawer_item_text_default">#bebebe</color>
+    <color name="drawer_item_text_checked">@color/primary</color>
+
+
+    <color name="primary">#FF9800</color>
+    <color name="primary_dark">#F57C00</color>
+    <color name="primary_light">#FFE0B2</color>
+    <color name="accent">#9E9E9E</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#212121</color>
+    <color name="divider">#B6B6B6</color>
+    <color name="white">#FFFFFF</color>
 
 </resources>

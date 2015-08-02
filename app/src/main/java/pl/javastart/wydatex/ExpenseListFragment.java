@@ -4,10 +4,8 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -40,7 +38,15 @@ public class ExpenseListFragment extends Fragment {
         });
         expenseListView.setEmptyView(view.findViewById(R.id.no_expenses));
 
-        setHasOptionsMenu(true);
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), ExpenseActivity.class);
+                startActivity(intent);
+            }
+        });
+
 
         return view;
     }
@@ -88,24 +94,5 @@ public class ExpenseListFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main_menu, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.add_new_expense:
-                Intent intent = new Intent(getActivity().getApplicationContext(), ExpenseActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.preferences:
-                // TODO
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
 }

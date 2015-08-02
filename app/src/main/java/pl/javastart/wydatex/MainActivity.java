@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final ExpenseListFragment expenseListFragment = new ExpenseListFragment();
     private final LocationFragment locationFragment = new LocationFragment();
+    private final PreferencesFragment preferencesFragment = new PreferencesFragment();
     private final Handler mDrawerActionHandler = new Handler();
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.drawer_settings:
                 getFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.content, new PreferencesFragment())
+                        .replace(R.id.content, preferencesFragment)
                         .commit();
             default:
                 // ignore
