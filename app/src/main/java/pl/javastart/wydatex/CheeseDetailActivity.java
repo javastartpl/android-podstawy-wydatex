@@ -50,7 +50,7 @@ public class CheeseDetailActivity extends AppCompatActivity {
     }
 
     private void loadBackdrop() {
-        final ImageView imageView = (ImageView) findViewById(R.id.backdrop);
+        final ImageView imageView = (ImageView) findViewById(R.id.backdropImage);
         Glide.with(this).load(Cheeses.getRandomCheeseDrawable()).centerCrop().into(imageView);
     }
 

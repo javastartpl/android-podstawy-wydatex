@@ -1,7 +1,9 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.database;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+
+import pl.javastart.wydatex.ExpenseCategory;
 
 @DatabaseTable(tableName = "expense")
 public class Expense {
@@ -16,17 +18,23 @@ public class Expense {
     private double price;
 
     @DatabaseField
+    private String photoPath;
+
+    @DatabaseField
     private ExpenseCategory category;
 
+    @DatabaseField(foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
+    private Location location;
 
     @SuppressWarnings("unused")
     public Expense() {
     }
 
-    public Expense(String name, double price, ExpenseCategory category) {
+    public Expense(String name, double price, ExpenseCategory category, String photoPath) {
         this.name = name;
         this.price = price;
         this.category = category;
+        this.photoPath = photoPath;
     }
 
     public Long getId() {
@@ -59,5 +67,13 @@ public class Expense {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPhotoPath() {
+        return photoPath;
+    }
+
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
     }
 }

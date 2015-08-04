@@ -1,7 +1,11 @@
 package pl.javastart.wydatex.location;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -9,16 +13,37 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import pl.javastart.wydatex.R;
+import pl.javastart.wydatex.database.Location;
+import pl.javastart.wydatex.database.LocationRepository;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends AppCompatActivity {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    public static final String EXTRA_LOCATION_ID = "extra.location.id";
+
+    private Location location;
+
+    private GoogleMap googleMap;
+
+    private EditText locationName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        locationName = (EditText) findViewById(R.id.location_name);
+
         setUpMapIfNeeded();
+
+        if(getIntent().getExtras() != null) {
+            long locationId = getIntent().getExtras().getLong(EXTRA_LOCATION_ID);
+            location = LocationRepository.findById(this, locationId);
+        } else {
+            location = new Location();
+        }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -27,29 +52,14 @@ public class MapsActivity extends FragmentActivity {
         setUpMapIfNeeded();
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+            if (googleMap != null) {
                 setUpMap();
             }
         }
@@ -59,9 +69,39 @@ public class MapsActivity extends FragmentActivity {
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Africa.
      * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        if(location != null) {
+            googleMap.addMarker(new MarkerOptions().position(new LatLng(location.getLat(), location.getLng())).title(location.getName()));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_map_activity, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.save) {
+            saveCurrentLocation();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void saveCurrentLocation() {
+        double lat = googleMap.getCameraPosition().target.latitude;
+        double lng = googleMap.getCameraPosition().target.longitude;
+        location.setLat(lat);
+        location.setLng(lng);
+        location.setName(locationName.getText().toString());
+        LocationRepository.insertOrUpdate(this, location);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }

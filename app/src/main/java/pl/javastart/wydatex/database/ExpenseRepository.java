@@ -6,8 +6,6 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 import java.util.List;
 
-import pl.javastart.wydatex.Expense;
-
 public class ExpenseRepository {
 
     public static List<Expense> getAllExpenses(Context context) {

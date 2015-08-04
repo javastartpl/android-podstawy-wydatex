@@ -16,6 +16,10 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
 
@@ -45,12 +49,15 @@
         <activity
             android:name=".ExpenseActivity"
             android:label="Dodaj wydatek"
+            android:windowSoftInputMode="adjustNothing"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
 
+
+        <activity android:name=".location.MapsActivity" />
 
     </application>
 

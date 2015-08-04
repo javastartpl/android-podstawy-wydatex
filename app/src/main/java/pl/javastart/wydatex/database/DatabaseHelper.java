@@ -10,8 +10,6 @@ import com.j256.ormlite.table.TableUtils;
 
 import java.sql.SQLException;
 
-import pl.javastart.wydatex.Expense;
-
 public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static final String DATABASE_NAME = "wydatex.db";
@@ -19,6 +17,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
 
     private static DatabaseHelper instance;
     private RuntimeExceptionDao<Expense, Long> expenseDao;
+    private RuntimeExceptionDao<Location, Long> locationDao;
 
     public DatabaseHelper(Context context, String databaseName, SQLiteDatabase.CursorFactory factory, int databaseVersion) {
         super(context, databaseName, factory, databaseVersion);
@@ -45,7 +44,9 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private void recreateDatabase(ConnectionSource connectionSource) {
         try {
             TableUtils.dropTable(connectionSource, Expense.class, true);
+            TableUtils.dropTable(connectionSource, Location.class, true);
             TableUtils.createTableIfNotExists(connectionSource, Expense.class);
+            TableUtils.createTableIfNotExists(connectionSource, Location.class);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -56,6 +57,13 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             expenseDao = getRuntimeExceptionDao(Expense.class);
         }
         return expenseDao;
+    }
+
+    public RuntimeExceptionDao<Location, Long> getLocationDao() {
+        if (locationDao == null) {
+            locationDao = getRuntimeExceptionDao(Location.class);
+        }
+        return locationDao;
     }
 
 }
