@@ -1,10 +1,11 @@
 package pl.javastart.wydatex.database;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 
-import pl.javastart.wydatex.location.MapsActivity;
+import java.util.List;
 
 public class LocationRepository {
 
@@ -22,5 +23,9 @@ public class LocationRepository {
 
     public static void insertOrUpdate(Context context, Location location) {
         dao(context).createOrUpdate(location);
+    }
+
+    public static List<Location> findAll(Context context) {
+        return dao(context).queryForAll();
     }
 }

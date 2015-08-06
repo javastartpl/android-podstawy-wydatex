@@ -118,6 +118,10 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ExpenseActivity.this, MapsActivity.class);
+                intent.putExtra(MapsActivity.EXTRA_EXPENSE_ID, expense.getId());
+                if(expense.getLocation() != null) {
+                    intent.putExtra(MapsActivity.EXTRA_LOCATION_ID, expense.getLocation().getId());
+                }
                 startActivity(intent);
             }
         });
@@ -128,7 +132,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
             photoImageButton.setVisibility(View.GONE);
             photoView.setVisibility(View.VISIBLE);
             String photoPath = expense.getPhotoPath();
-            Glide.with(this).load(photoPath).asBitmap().fitCenter().into(photoView);
+            Glide.with(this).load(photoPath).fitCenter().into(photoView);
         } else {
             photoImageButton.setVisibility(View.VISIBLE);
             photoView.setVisibility(View.GONE);

@@ -18,7 +18,6 @@ import pl.javastart.wydatex.database.Expense;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder> {
 
-    private final TypedValue mTypedValue = new TypedValue();
     private int mBackground;
     private List<Expense> expenses;
 
@@ -27,12 +26,6 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public Long id;
-        public String name;
-        public String category;
-        public String price;
-        public String photoPath;
-
         public final View view;
         public final ImageView imageView;
         public final TextView nameTextView;
@@ -54,13 +47,10 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
         }
     }
 
-    public Expense getValueAt(int position) {
-        return expenses.get(position);
-    }
-
     public ExpenseAdapter(Context context, List<Expense> items) {
-        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
-        mBackground = mTypedValue.resourceId;
+        TypedValue typedValue = new TypedValue();
+        context.getTheme().resolveAttribute(R.attr.selectableItemBackground, typedValue, true);
+        mBackground = typedValue.resourceId;
         expenses = items;
     }
 
@@ -74,33 +64,26 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Expense expense = expenses.get(position);
-        holder.id = expense.getId();
-        holder.name = expense.getName();
-        holder.category = expense.getCategory().getName();
+        final Expense expense = expenses.get(position);
 
-        holder.price = String.format("%.2f", expense.getPrice()) + "zł";
-        holder.photoPath = expense.getPhotoPath();
-
-
-        holder.nameTextView.setText(holder.name);
-        holder.categoryTextView.setText(holder.category);
-        holder.priceTextView.setText(holder.price);
+        holder.nameTextView.setText(expense.getName());
+        holder.categoryTextView.setText(expense.getCategory().getName());
+        holder.priceTextView.setText(String.format("%.2f", expense.getPrice()) + "zł");
 
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
                 Intent intent = new Intent(context, ExpenseActivity.class);
-                intent.putExtra(ExpenseActivity.EXTRA_ID, holder.id);
+                intent.putExtra(ExpenseActivity.EXTRA_ID, expense.getId());
 
                 context.startActivity(intent);
             }
         });
 
-        if (holder.photoPath != null) {
+        if (expense.getPhotoPath() != null) {
             Glide.with(holder.imageView.getContext())
-                    .load(holder.photoPath)
+                    .load(expense.getPhotoPath())
                     .fitCenter()
                     .into(holder.imageView);
         }

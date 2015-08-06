@@ -7,41 +7,74 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import pl.javastart.wydatex.R;
+import pl.javastart.wydatex.database.Expense;
+import pl.javastart.wydatex.database.ExpenseRepository;
 import pl.javastart.wydatex.database.Location;
 import pl.javastart.wydatex.database.LocationRepository;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
 
     public static final String EXTRA_LOCATION_ID = "extra.location.id";
+    public static final String EXTRA_EXPENSE_ID = "extra.expense.id";
 
+    private Expense expense;
     private Location location;
 
     private GoogleMap googleMap;
 
     private EditText locationName;
+    private GoogleApiClient googleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        setupToolbar();
+
         locationName = (EditText) findViewById(R.id.location_name);
 
         setUpMapIfNeeded();
 
-        if(getIntent().getExtras() != null) {
+        if(getIntent().getExtras().getLong(EXTRA_LOCATION_ID) != 0) {
             long locationId = getIntent().getExtras().getLong(EXTRA_LOCATION_ID);
             location = LocationRepository.findById(this, locationId);
-        } else {
-            location = new Location();
-        }
+            locationName.setText(location.getName());
+            showLocationMarker();
+            navigateMapCameraTo(location);
 
+        } else {
+            long expenseId = getIntent().getExtras().getLong(EXTRA_EXPENSE_ID);
+            expense = ExpenseRepository.findById(this, expenseId);
+            location = new Location();
+            expense.setLocation(location);
+            buildGoogleApiClient();
+            googleApiClient.connect();
+        }
+    }
+
+    private void navigateMapCameraTo(Location location) {
+        LatLng pos = new LatLng(location.getLat(), location.getLng());
+
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(pos)
+                .zoom(14)
+                .build();
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+    }
+
+    private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
@@ -53,25 +86,13 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
         if (googleMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (googleMap != null) {
-                setUpMap();
-            }
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+
         }
     }
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #googleMap} is not null.
-     */
-    private void setUpMap() {
+    private void showLocationMarker() {
         if(location != null) {
             googleMap.addMarker(new MarkerOptions().position(new LatLng(location.getLat(), location.getLng())).title(location.getName()));
         }
@@ -87,6 +108,7 @@ public class MapsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.save) {
             saveCurrentLocation();
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -98,10 +120,40 @@ public class MapsActivity extends AppCompatActivity {
         location.setLng(lng);
         location.setName(locationName.getText().toString());
         LocationRepository.insertOrUpdate(this, location);
+        ExpenseRepository.update(this, expense);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
     }
+
+    protected synchronized void buildGoogleApiClient() {
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        android.location.Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient);
+
+        LatLng pos = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+
+        CameraPosition cameraPosition = CameraPosition.builder()
+                .target(pos)
+                .zoom(14)
+                .build();
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
 }

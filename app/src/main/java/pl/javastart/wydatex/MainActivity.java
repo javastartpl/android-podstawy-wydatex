@@ -26,15 +26,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import pl.javastart.wydatex.location.LocationFragment;
+import pl.javastart.wydatex.location.LocationListFragment;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LocationFragment.OnFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final long DRAWER_CLOSE_DELAY_MS = 350;
     private static final String NAV_ITEM_ID = "navItemId";
 
     private final ExpenseListFragment expenseListFragment = new ExpenseListFragment();
-    private final LocationFragment locationFragment = new LocationFragment();
+    private final LocationListFragment locationListFragment = new LocationListFragment();
     private final PreferencesFragment preferencesFragment = new PreferencesFragment();
     private final Handler mDrawerActionHandler = new Handler();
     private DrawerLayout mDrawerLayout;
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.drawer_item_2:
                 getFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.content, locationFragment)
+                        .replace(R.id.content, locationListFragment)
                         .commit();
                 break;
             case R.id.drawer_settings:
@@ -150,8 +150,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         outState.putInt(NAV_ITEM_ID, mNavItemId);
     }
 
-    @Override
-    public void onFragmentInteraction(String id) {
-
-    }
 }
