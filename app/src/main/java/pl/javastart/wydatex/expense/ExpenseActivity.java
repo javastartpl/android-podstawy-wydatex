@@ -11,8 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,6 +24,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.File;
 import java.util.UUID;
@@ -34,9 +33,12 @@ import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.DatabaseHelper;
 import pl.javastart.wydatex.database.Expense;
 import pl.javastart.wydatex.database.ExpenseRepository;
-import pl.javastart.wydatex.location.MapsActivity;
+import pl.javastart.wydatex.database.Location;
+import pl.javastart.wydatex.location.LocationActivity;
 
 public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap googleMap;
 
     private enum State {NEW, EDIT}
 
@@ -53,6 +55,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
 
     private ImageButton photoImageButton;
     private ImageView photoView;
+    private TextView locationNameTextView;
 
     private String photoPath;
 
@@ -60,7 +63,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
 
     private SharedPreferences sharedPreferences;
 
-    private GoogleMap googleMap;
+    private MapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +83,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         priceEditText = (EditText) findViewById(R.id.expensePrice);
         categorySpinner = (Spinner) findViewById(R.id.expense_category);
 
-        categorySpinner.setAdapter(new CategoryAdapter());
+        categorySpinner.setAdapter(new CategoryAdapter(this));
 
         long id = INVALID_ID;
         if (getIntent().getExtras() != null) {
@@ -107,26 +110,47 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
             loadDefaultValues();
         }
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+
 
         photoImageButton = (ImageButton) findViewById(R.id.backdropButton);
         photoView = (ImageView) findViewById(R.id.backdropImage);
+        locationNameTextView = (TextView) findViewById(R.id.location_name);
 
         updatePhoto();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         findViewById(R.id.map_layout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ExpenseActivity.this, MapsActivity.class);
-                intent.putExtra(MapsActivity.EXTRA_EXPENSE_ID, expense.getId());
-                if(expense.getLocation() != null) {
-                    intent.putExtra(MapsActivity.EXTRA_LOCATION_ID, expense.getLocation().getId());
-                }
-                startActivity(intent);
+                openLocationActivity();
             }
         });
+
+        mapFragment.getMapAsync(this);
+        updateMap(googleMap);
     }
+
+    private void openLocationActivity() {
+        Intent intent = new Intent(ExpenseActivity.this, LocationActivity.class);
+
+        if(expense.getId() == null) {
+            ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
+            expense.setCategory(category);
+            ExpenseRepository.createOrUpdate(this, expense);
+        }
+
+        intent.putExtra(LocationActivity.EXTRA_EXPENSE_ID, expense.getId());
+        if (expense.getLocation() != null) {
+            intent.putExtra(LocationActivity.EXTRA_LOCATION_ID, expense.getLocation().getId());
+        }
+        startActivity(intent);
+    }
+
 
     private void updatePhoto() {
         if (expense != null && expense.getPhotoPath() != null) {
@@ -170,36 +194,6 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private class CategoryAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return ExpenseCategory.values().length;
-        }
-
-        @Override
-        public ExpenseCategory getItem(int position) {
-            return ExpenseCategory.values()[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(android.R.layout.simple_dropdown_item_1line, null);
-            }
-
-            TextView textView = (TextView) convertView.findViewById(android.R.id.text1);
-            textView.setText(getItem(position).getName());
-
-            return convertView;
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (state == State.NEW) {
@@ -216,13 +210,21 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         switch (item.getItemId()) {
             case R.id.save:
                 if (state == State.NEW) {
-                    addNewExpense();
+                    boolean success = addNewExpense();
+                    if(success) {
+                        finish();
+                    }
                 } else {
                     saveChanges();
+                    finish();
                 }
-                finish();
                 return true;
             case R.id.delete:
+                if(expense.getPhotoPath() != null) {
+                    File file = new File(expense.getPhotoPath());
+                    file.delete();
+                }
+
                 DatabaseHelper.getInstance(this).getExpenseDao().delete(expense);
                 finish();
                 return true;
@@ -231,7 +233,21 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         }
     }
 
-    private void addNewExpense() {
+    /**
+     * @return true on success, false otherwise
+     */
+    private boolean addNewExpense() {
+
+        if(titleEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(this, "Podaj nazwę wydatku!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if(priceEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(this, "Podaj cenę wydatku!", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         expense.setName(titleEditText.getText().toString());
 
         double price = Double.parseDouble(priceEditText.getText().toString());
@@ -240,11 +256,13 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
         expense.setCategory(category);
 
-        ExpenseRepository.addExpense(this, expense);
+        ExpenseRepository.createOrUpdate(this, expense);
 
         if (state == State.NEW && shouldCareAboutLastCategory()) {
             saveLastCategory(category);
         }
+
+        return true;
     }
 
     private void saveLastCategory(ExpenseCategory expenseCategory) {
@@ -264,12 +282,38 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        updateMap(googleMap);
+    }
+
+    private void updateMap(GoogleMap googleMap) {
+        if(googleMap == null) {
+            return;
+        }
+        googleMap.clear();
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.9976972, 19.2078602), 5));
+
+        Location location = expense.getLocation();
+        if(location != null) {
+            LatLng latLng = new LatLng(location.getLat(), location.getLng());
+            float zoom = location.getZoom();
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(location.getLat(), location.getLng()));
+            googleMap.addMarker(marker);
+            locationNameTextView.setText(location.getName());
+        } else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.9976972, 19.2078602), 5));
+        }
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                openLocationActivity();
+            }
+        });
     }
 
     private void dispatchTakePictureIntent() {

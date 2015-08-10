@@ -28,4 +28,8 @@ public class LocationRepository {
     public static List<Location> findAll(Context context) {
         return dao(context).queryForAll();
     }
+
+    public static void delete(Context context, Location location) {
+        dao(context).delete(location);
+    }
 }

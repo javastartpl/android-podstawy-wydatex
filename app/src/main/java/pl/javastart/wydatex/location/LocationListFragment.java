@@ -1,8 +1,10 @@
 package pl.javastart.wydatex.location;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ public class LocationListFragment extends Fragment {
 
     private LocationAdapter adapter;
     private RecyclerView recyclerView;
+    private FloatingActionButton fab;
 
     @Nullable
     @Override
@@ -31,6 +34,14 @@ public class LocationListFragment extends Fragment {
         adapter = new LocationAdapter(getActivity(), locations);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(adapter);
+        fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), LocationActivity.class);
+                startActivity(intent);
+            }
+        });
 
         return view;
     }

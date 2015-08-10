@@ -6,8 +6,6 @@ import com.j256.ormlite.dao.RuntimeExceptionDao;
 
 import java.util.List;
 
-import pl.javastart.wydatex.location.MapsActivity;
-
 public class ExpenseRepository {
 
     private static RuntimeExceptionDao<Expense, Long> dao(Context context) {
@@ -18,8 +16,8 @@ public class ExpenseRepository {
         return dao(context).queryForAll();
     }
 
-    public static void addExpense(Context context, Expense expense) {
-        dao(context).create(expense);
+    public static void createOrUpdate(Context context, Expense expense) {
+        dao(context).createOrUpdate(expense);
     }
 
     public static Expense findById(Context context, Long id) {

@@ -1,6 +1,7 @@
 package pl.javastart.wydatex.location;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -23,11 +24,12 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public Long id;
+        public View view;
         public final TextView name;
 
         public ViewHolder(View view) {
             super(view);
+            this.view = view;
             name = (TextView) view.findViewById(android.R.id.text1);
         }
 
@@ -53,8 +55,18 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(LocationAdapter.ViewHolder holder, int position) {
-        Location location = locations.get(position);
+        final Location location = locations.get(position);
         holder.name.setText(location.getName());
+
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, LocationActivity.class);
+                intent.putExtra(LocationActivity.EXTRA_LOCATION_ID, location.getId());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override

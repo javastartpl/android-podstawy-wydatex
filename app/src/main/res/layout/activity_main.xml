@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar instead of ActionBar so the drawer can slide on top -->
+        <!-- Toolbar instead of ActionBar so the navigation_drawer can slide on top -->
         <include layout="@layout/toolbar" />
 
         <!-- Real content goes here -->
@@ -22,7 +22,7 @@
             android:layout_weight="1" />
     </LinearLayout>
 
-    <!-- The navigation drawer -->
+    <!-- The navigation navigation_drawer -->
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation"
         android:layout_width="wrap_content"
@@ -31,6 +31,6 @@
         app:headerLayout="@layout/drawer_header"
         app:itemIconTint="@color/drawer_item_text"
         app:itemTextColor="@color/drawer_item_text"
-        app:menu="@menu/drawer" />
+        app:menu="@menu/navigation_drawer" />
 
 </android.support.v4.widget.DrawerLayout>

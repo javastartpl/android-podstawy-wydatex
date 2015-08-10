@@ -18,6 +18,9 @@ public class Location {
     @DatabaseField
     private double lng;
 
+    @DatabaseField
+    private float zoom;
+
     public Long getId() {
         return id;
     }
@@ -48,5 +51,13 @@ public class Location {
 
     public void setLng(double lng) {
         this.lng = lng;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
     }
 }

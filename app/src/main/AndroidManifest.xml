@@ -51,13 +51,10 @@
             android:label="Dodaj wydatek"
             android:windowSoftInputMode="adjustNothing"
             android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
         </activity>
 
-
-        <activity android:name=".location.MapsActivity" />
+        <activity android:name=".location.LocationActivity"
+            android:parentActivityName=".MainActivity"/>
 
     </application>
 

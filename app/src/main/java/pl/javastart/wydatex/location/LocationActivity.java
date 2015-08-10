@@ -22,7 +22,7 @@ import pl.javastart.wydatex.database.ExpenseRepository;
 import pl.javastart.wydatex.database.Location;
 import pl.javastart.wydatex.database.LocationRepository;
 
-public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
+public class LocationActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
 
     public static final String EXTRA_LOCATION_ID = "extra.location.id";
     public static final String EXTRA_EXPENSE_ID = "extra.expense.id";
@@ -46,7 +46,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         setUpMapIfNeeded();
 
-        if(getIntent().getExtras().getLong(EXTRA_LOCATION_ID) != 0) {
+        if(getIntent().getExtras() == null) {
+            location = new Location();
+        }else if(getIntent().getExtras().getLong(EXTRA_LOCATION_ID) != 0) {
             long locationId = getIntent().getExtras().getLong(EXTRA_LOCATION_ID);
             location = LocationRepository.findById(this, locationId);
             locationName.setText(location.getName());
@@ -77,6 +79,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     private void setupToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -100,7 +105,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_map_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_location_activity, menu);
         return true;
     }
 
@@ -110,14 +115,31 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
             saveCurrentLocation();
             finish();
         }
+
+        if(item.getItemId() == R.id.delete) {
+            deleteLocation();
+            finish();
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteLocation() {
+        if(expense != null && expense.getLocation() != null) {
+            expense.setLocation(null);
+            ExpenseRepository.update(this, expense);
+        }
+
+        LocationRepository.delete(this, location);
     }
 
     private void saveCurrentLocation() {
         double lat = googleMap.getCameraPosition().target.latitude;
         double lng = googleMap.getCameraPosition().target.longitude;
+        float zoom = googleMap.getCameraPosition().zoom;
         location.setLat(lat);
         location.setLng(lng);
+        location.setZoom(zoom);
         location.setName(locationName.getText().toString());
         LocationRepository.insertOrUpdate(this, location);
         ExpenseRepository.update(this, expense);
