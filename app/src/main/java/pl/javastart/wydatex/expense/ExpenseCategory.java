@@ -1,4 +1,4 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.expense;
 
 public enum ExpenseCategory {
 
@@ -9,14 +9,14 @@ public enum ExpenseCategory {
         return name;
     }
 
-    private ExpenseCategory(String name) {
+    ExpenseCategory(String name) {
         this.name = name;
     }
 
     public static int getId(String categoryName) {
         int counter = 0;
-        for(ExpenseCategory category: values()) {
-            if(category.name().equals(categoryName))
+        for (ExpenseCategory category : values()) {
+            if (category.name().equals(categoryName))
                 return counter;
 
             counter++;

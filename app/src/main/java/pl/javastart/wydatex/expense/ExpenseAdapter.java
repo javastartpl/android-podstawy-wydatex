@@ -1,4 +1,4 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.expense;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Expense;
 
 public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ViewHolder> {

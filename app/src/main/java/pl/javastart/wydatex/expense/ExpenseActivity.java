@@ -1,4 +1,4 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.expense;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.File;
 import java.util.UUID;
 
+import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.DatabaseHelper;
 import pl.javastart.wydatex.database.Expense;
 import pl.javastart.wydatex.database.ExpenseRepository;

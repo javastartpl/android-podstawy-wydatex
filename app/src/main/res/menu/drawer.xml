@@ -5,11 +5,11 @@
         <item
             android:id="@+id/drawer_item_1"
             android:icon="@drawable/ic_attach_money_white"
-            android:title="Wydatki" />
+            android:title="@string/expenses" />
         <item
             android:id="@+id/drawer_item_2"
             android:icon="@drawable/ic_map_white"
-            android:title="Miejsca" />
+            android:title="@string/locations" />
     </group>
 
     <group android:checkableBehavior="single">
@@ -22,6 +22,4 @@
             </menu>
         </item>
     </group>
-
-
 </menu>

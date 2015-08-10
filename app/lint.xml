@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+
+    <issue id="RtlHardcoded" severity="ignore" />
+    <issue id="RtlEnabled" severity="ignore" />
+
+    <issue id="IconDensities" severity="ignore" />
+
     <issue id="UnusedResources">
-        <ignore path="/src/main/res/values/colors.xml" />
+        <ignore path="src/main/res/values/colors.xml" />
     </issue>
 </lint>

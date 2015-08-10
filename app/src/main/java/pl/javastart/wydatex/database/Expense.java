@@ -3,7 +3,7 @@ package pl.javastart.wydatex.database;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-import pl.javastart.wydatex.ExpenseCategory;
+import pl.javastart.wydatex.expense.ExpenseCategory;
 
 @DatabaseTable(tableName = "expense")
 public class Expense {

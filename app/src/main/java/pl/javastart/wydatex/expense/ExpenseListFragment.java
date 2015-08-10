@@ -1,4 +1,4 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.expense;
 
 import android.app.Fragment;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Expense;
 import pl.javastart.wydatex.database.ExpenseRepository;
 

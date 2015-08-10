@@ -1,7 +1,9 @@
-package pl.javastart.wydatex;
+package pl.javastart.wydatex.preferences;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+
+import pl.javastart.wydatex.R;
 
 public class PreferencesFragment extends PreferenceFragment {
 

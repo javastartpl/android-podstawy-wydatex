@@ -26,7 +26,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import pl.javastart.wydatex.expense.ExpenseListFragment;
 import pl.javastart.wydatex.location.LocationListFragment;
+import pl.javastart.wydatex.preferences.PreferencesFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
