@@ -66,7 +66,7 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     private void navigateMapCameraTo(Location location) {
-        LatLng pos = new LatLng(location.getLat(), location.getLng());
+        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
 
         CameraPosition cameraPosition = CameraPosition.builder()
                 .target(pos)
@@ -99,7 +99,7 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
 
     private void showLocationMarker() {
         if(location != null) {
-            googleMap.addMarker(new MarkerOptions().position(new LatLng(location.getLat(), location.getLng())).title(location.getName()));
+            googleMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title(location.getName()));
         }
     }
 
@@ -137,8 +137,8 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
         double lat = googleMap.getCameraPosition().target.latitude;
         double lng = googleMap.getCameraPosition().target.longitude;
         float zoom = googleMap.getCameraPosition().zoom;
-        location.setLat(lat);
-        location.setLng(lng);
+        location.setLatitude(lat);
+        location.setLongitude(lng);
         location.setZoom(zoom);
         location.setName(locationName.getText().toString());
         LocationRepository.insertOrUpdate(this, location);

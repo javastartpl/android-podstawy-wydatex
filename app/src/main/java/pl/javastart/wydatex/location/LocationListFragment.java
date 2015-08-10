@@ -1,7 +1,9 @@
 package pl.javastart.wydatex.location;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -11,11 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Location;
 import pl.javastart.wydatex.database.LocationRepository;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class LocationListFragment extends Fragment {
 
@@ -49,9 +57,59 @@ public class LocationListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        updateList();
+        UpdateLocationsAsyncTask asyncTask = new UpdateLocationsAsyncTask();
+        asyncTask.execute();
+    }
+
+    private void updateList() {
         List<Location> locations = LocationRepository.findAll(getActivity());
         adapter.setLocations(locations);
         adapter.notifyDataSetChanged();
     }
 
+
+    private class UpdateLocationsAsyncTask extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            RestAdapter restAdapter = new RestAdapter.Builder()
+                    .setEndpoint("https://webservice-javastartpl.rhcloud.com")
+                    .build();
+
+            CategoryWebService service = restAdapter.create(CategoryWebService.class);
+
+            boolean newDataAdded = false;
+
+            List<Location> locations = null;
+
+            try {
+                locations = service.getAll();
+            } catch (RuntimeException e) {
+                e.printStackTrace();;
+            }
+
+            List<Location> databaseLocations = LocationRepository.findAll(getActivity());
+            Set<String> locationNames = new HashSet<>();
+            for (Location databaseLocation : databaseLocations) {
+                locationNames.add(databaseLocation.getName());
+            }
+
+            for (Location location : locations) {
+                if (!locationNames.contains(location.getName())) {
+                    LocationRepository.insert(getActivity(), location);
+                    newDataAdded = true;
+                }
+            }
+
+            return newDataAdded;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean newDataAdded) {
+            if(newDataAdded) {
+                updateList();
+            }
+        }
+    }
 }

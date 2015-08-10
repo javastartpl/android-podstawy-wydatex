@@ -298,10 +298,10 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
 
         Location location = expense.getLocation();
         if(location != null) {
-            LatLng latLng = new LatLng(location.getLat(), location.getLng());
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             float zoom = location.getZoom();
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-            MarkerOptions marker = new MarkerOptions().position(new LatLng(location.getLat(), location.getLng()));
+            MarkerOptions marker = new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude()));
             googleMap.addMarker(marker);
             locationNameTextView.setText(location.getName());
         } else {

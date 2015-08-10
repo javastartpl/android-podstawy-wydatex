@@ -13,10 +13,10 @@ public class Location {
     private String name;
 
     @DatabaseField
-    private double lat;
+    private double latitude;
 
     @DatabaseField
-    private double lng;
+    private double longitude;
 
     @DatabaseField
     private float zoom;
@@ -37,20 +37,20 @@ public class Location {
         this.name = name;
     }
 
-    public double getLat() {
-        return lat;
+    public double getLatitude() {
+        return latitude;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
     }
 
-    public double getLng() {
-        return lng;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setLng(double lng) {
-        this.lng = lng;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     public float getZoom() {
