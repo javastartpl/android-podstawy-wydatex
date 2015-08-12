@@ -25,7 +25,7 @@
     <color name="primaryText">#de000000</color>
     <color name="secondaryText">#8a000000</color>
 
-    <color name="drawer_header_bg">@color/secondary</color>
+    <color name="drawer_header_bg">@color/primary_dark</color>
     <color name="drawer_item_text_default">#bebebe</color>
     <color name="drawer_item_text_checked">@color/primary</color>
 
