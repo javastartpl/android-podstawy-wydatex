@@ -316,18 +316,6 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         });
     }
 
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            photoFile = createImageFile();
-            photoPath = photoFile.getAbsolutePath();
-
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-        }
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -338,6 +326,18 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
             Toast.makeText(this, "Anulowano", Toast.LENGTH_SHORT).show();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            photoFile = createImageFile();
+            photoPath = photoFile.getAbsolutePath();
+
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
         }
     }
 

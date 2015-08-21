@@ -6,11 +6,10 @@ import pl.javastart.wydatex.database.Location;
 import retrofit.Callback;
 import retrofit.http.GET;
 
-public interface CategoryWebService {
+public interface LocationWebService {
 
     @GET("/locations/")
     void getAll(Callback<List<Location>> callback);
-
 
     @GET("/locations/")
     List<Location> getAll();

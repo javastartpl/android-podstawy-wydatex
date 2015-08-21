@@ -170,7 +170,6 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
                 .build();
 
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
 
     @Override

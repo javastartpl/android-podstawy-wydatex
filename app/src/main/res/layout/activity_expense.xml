@@ -59,9 +59,9 @@
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/nested_scroll_view"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -111,11 +111,11 @@
                                     android:id="@+id/expense_name"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
-                                    android:inputType="textPersonName"
                                     android:layout_alignParentLeft="true"
                                     android:layout_alignParentTop="true"
                                     android:ems="10"
-                                    android:hint="Nazwa wydatku" />
+                                    android:hint="Nazwa wydatku"
+                                    android:inputType="textPersonName" />
                             </android.support.design.widget.TextInputLayout>
 
                             <android.support.design.widget.TextInputLayout
@@ -155,9 +155,9 @@
                 android:layout_marginRight="@dimen/card_margin">
 
                 <LinearLayout
+                    android:id="@+id/map_layout"
                     style="@style/Widget.CardContent"
                     android:layout_width="match_parent"
-                    android:id="@+id/map_layout"
                     android:layout_height="@dimen/detail_backdrop_height">
 
                     <TextView

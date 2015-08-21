@@ -1,7 +1,6 @@
 package pl.javastart.wydatex.location;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,10 +19,7 @@ import java.util.Set;
 import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Location;
 import pl.javastart.wydatex.database.LocationRepository;
-import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class LocationListFragment extends Fragment {
 
@@ -51,13 +47,14 @@ public class LocationListFragment extends Fragment {
             }
         });
 
+        updateList();
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        updateList();
         UpdateLocationsAsyncTask asyncTask = new UpdateLocationsAsyncTask();
         asyncTask.execute();
     }
@@ -77,7 +74,7 @@ public class LocationListFragment extends Fragment {
                     .setEndpoint("https://webservice-javastartpl.rhcloud.com")
                     .build();
 
-            CategoryWebService service = restAdapter.create(CategoryWebService.class);
+            LocationWebService service = restAdapter.create(LocationWebService.class);
 
             boolean newDataAdded = false;
 

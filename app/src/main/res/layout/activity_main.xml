@@ -11,8 +11,12 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar instead of ActionBar so the navigation_drawer can slide on top -->
-        <include layout="@layout/toolbar" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/abc_action_bar_default_height_material"
+            android:background="?attr/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
         <!-- Real content goes here -->
         <FrameLayout
