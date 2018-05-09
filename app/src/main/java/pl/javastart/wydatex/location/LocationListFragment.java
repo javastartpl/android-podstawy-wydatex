@@ -71,7 +71,7 @@ public class LocationListFragment extends Fragment {
         @Override
         protected Boolean doInBackground(Void... params) {
             RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint("https://webservice-javastartpl.rhcloud.com")
+                    .setEndpoint("http://przyklady.javastart.pl/ap")
                     .build();
 
             LocationWebService service = restAdapter.create(LocationWebService.class);
