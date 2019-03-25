@@ -11,6 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -18,9 +19,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Expense;
-import pl.javastart.wydatex.database.ExpenseRepository;
 import pl.javastart.wydatex.database.Location;
-import pl.javastart.wydatex.database.LocationRepository;
+import pl.javastart.wydatex.database.WydatexDatabase;
 
 public class LocationActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks {
 
@@ -42,27 +42,32 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
 
         setupToolbar();
 
-        locationName = (EditText) findViewById(R.id.location_name);
+        locationName = findViewById(R.id.location_name);
 
-        setUpMapIfNeeded();
+        setUpMapIfNeeded(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
 
-        if(getIntent().getExtras() == null) {
-            location = new Location();
-        }else if(getIntent().getExtras().getLong(EXTRA_LOCATION_ID) != 0) {
-            long locationId = getIntent().getExtras().getLong(EXTRA_LOCATION_ID);
-            location = LocationRepository.findById(this, locationId);
-            locationName.setText(location.getName());
-            showLocationMarker();
-            navigateMapCameraTo(location);
+                if(getIntent().getExtras() == null) {
+                    location = new Location();
+                }else if(getIntent().getExtras().getLong(EXTRA_LOCATION_ID) != 0) {
+                    long locationId = getIntent().getExtras().getLong(EXTRA_LOCATION_ID);
+                    location = WydatexDatabase.getDatabase(LocationActivity.this).getLocationDao().findById(locationId);
+                    locationName.setText(location.getName());
+                    showLocationMarker();
+                    navigateMapCameraTo(location);
 
-        } else {
-            long expenseId = getIntent().getExtras().getLong(EXTRA_EXPENSE_ID);
-            expense = ExpenseRepository.findById(this, expenseId);
-            location = new Location();
-            expense.setLocation(location);
-            buildGoogleApiClient();
-            googleApiClient.connect();
-        }
+                } else {
+                    long expenseId = getIntent().getExtras().getLong(EXTRA_EXPENSE_ID);
+                    expense = WydatexDatabase.getDatabase(LocationActivity.this).getExpenseDao().findById(expenseId);
+                    location = new Location();
+                    expense.setLocationId(location.getId());
+                    buildGoogleApiClient();
+                    googleApiClient.connect();
+                }
+            }
+        });
+
     }
 
     private void navigateMapCameraTo(Location location) {
@@ -77,7 +82,7 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     private void setupToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -87,13 +92,25 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
+        setUpMapIfNeeded(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+
+            }
+        });
     }
 
-    private void setUpMapIfNeeded() {
+    private void setUpMapIfNeeded(final OnMapReadyCallback onMapReadyCallback) {
         if (googleMap == null) {
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
-
+            ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap map) {
+                    googleMap = map;
+                    onMapReadyCallback.onMapReady(map);
+                }
+            });
+        } else {
+            onMapReadyCallback.onMapReady(googleMap);
         }
     }
 
@@ -125,12 +142,12 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     private void deleteLocation() {
-        if(expense != null && expense.getLocation() != null) {
-            expense.setLocation(null);
-            ExpenseRepository.update(this, expense);
+        if(expense != null && expense.getLocationId() != null) {
+            expense.setLocationId(null);
+            WydatexDatabase.getDatabase(this).getExpenseDao().update(expense);
         }
 
-        LocationRepository.delete(this, location);
+        WydatexDatabase.getDatabase(this).getLocationDao().delete(location);
     }
 
     private void saveCurrentLocation() {
@@ -141,8 +158,8 @@ public class LocationActivity extends AppCompatActivity implements GoogleApiClie
         location.setLongitude(lng);
         location.setZoom(zoom);
         location.setName(locationName.getText().toString());
-        LocationRepository.insertOrUpdate(this, location);
-        ExpenseRepository.update(this, expense);
+        WydatexDatabase.getDatabase(this).getLocationDao().update(location);
+        WydatexDatabase.getDatabase(this).getExpenseDao().update(expense);
     }
 
     @Override

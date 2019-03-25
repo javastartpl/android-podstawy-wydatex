@@ -30,10 +30,9 @@ import java.io.File;
 import java.util.UUID;
 
 import pl.javastart.wydatex.R;
-import pl.javastart.wydatex.database.DatabaseHelper;
 import pl.javastart.wydatex.database.Expense;
-import pl.javastart.wydatex.database.ExpenseRepository;
 import pl.javastart.wydatex.database.Location;
+import pl.javastart.wydatex.database.WydatexDatabase;
 import pl.javastart.wydatex.location.LocationActivity;
 
 public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -79,9 +78,9 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
-        titleEditText = (EditText) findViewById(R.id.expense_name);
-        priceEditText = (EditText) findViewById(R.id.expensePrice);
-        categorySpinner = (Spinner) findViewById(R.id.expense_category);
+        titleEditText = findViewById(R.id.expense_name);
+        priceEditText = findViewById(R.id.expensePrice);
+        categorySpinner = findViewById(R.id.expense_category);
 
         categorySpinner.setAdapter(new CategoryAdapter(this));
 
@@ -93,7 +92,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         if (id != INVALID_ID) {
             // id zostało przekazane
             state = State.EDIT;
-            expense = DatabaseHelper.getInstance(this).getExpenseDao().queryForId(id);
+            expense = WydatexDatabase.getDatabase(this).getExpenseDao().findById(id);
             titleEditText.setText(expense.getName());
             priceEditText.setText(Double.toString(expense.getPrice()));
             categorySpinner.setSelection(ExpenseCategory.getId(expense.getCategory().getName()));
@@ -111,7 +110,6 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         }
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-
 
         photoImageButton = (ImageButton) findViewById(R.id.backdropButton);
         photoView = (ImageView) findViewById(R.id.backdropImage);
@@ -141,12 +139,12 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         if(expense.getId() == null) {
             ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
             expense.setCategory(category);
-            ExpenseRepository.createOrUpdate(this, expense);
+            WydatexDatabase.getDatabase(this).getExpenseDao().insert(expense);
         }
 
         intent.putExtra(LocationActivity.EXTRA_EXPENSE_ID, expense.getId());
-        if (expense.getLocation() != null) {
-            intent.putExtra(LocationActivity.EXTRA_LOCATION_ID, expense.getLocation().getId());
+        if (expense.getLocationId() != null) {
+            intent.putExtra(LocationActivity.EXTRA_LOCATION_ID, expense.getLocationId());
         }
         startActivity(intent);
     }
@@ -225,7 +223,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
                     file.delete();
                 }
 
-                DatabaseHelper.getInstance(this).getExpenseDao().delete(expense);
+                WydatexDatabase.getDatabase(this).getExpenseDao().delete(expense);
                 finish();
                 return true;
             default:
@@ -256,7 +254,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         ExpenseCategory category = (ExpenseCategory) categorySpinner.getSelectedItem();
         expense.setCategory(category);
 
-        ExpenseRepository.createOrUpdate(this, expense);
+        WydatexDatabase.getDatabase(this).getExpenseDao().insert(expense);
 
         if (state == State.NEW && shouldCareAboutLastCategory()) {
             saveLastCategory(category);
@@ -276,7 +274,7 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         expense.setName(titleEditText.getText().toString());
         expense.setPrice(Double.parseDouble(priceEditText.getText().toString()));
         expense.setCategory((ExpenseCategory) categorySpinner.getSelectedItem());
-        DatabaseHelper.getInstance(this).getExpenseDao().update(expense);
+        WydatexDatabase.getDatabase(this).getExpenseDao().update(expense);
     }
 
     @Override
@@ -296,7 +294,8 @@ public class ExpenseActivity extends AppCompatActivity implements OnMapReadyCall
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-        Location location = expense.getLocation();
+        Location location = WydatexDatabase.getDatabase(this).getLocationDao().findById(expense.getLocationId());
+
         if(location != null) {
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             float zoom = location.getZoom();

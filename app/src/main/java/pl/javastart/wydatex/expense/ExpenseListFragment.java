@@ -15,7 +15,7 @@ import java.util.List;
 
 import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Expense;
-import pl.javastart.wydatex.database.ExpenseRepository;
+import pl.javastart.wydatex.database.WydatexDatabase;
 
 public class ExpenseListFragment extends Fragment {
 
@@ -28,7 +28,7 @@ public class ExpenseListFragment extends Fragment {
 
         setupRecyclerView(view);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -42,10 +42,10 @@ public class ExpenseListFragment extends Fragment {
 
 
     private void setupRecyclerView(View parent) {
-        RecyclerView recyclerView = (RecyclerView) parent.findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = parent.findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
 
-        List<Expense> expenses = ExpenseRepository.getAllExpenses(getActivity());
+        List<Expense> expenses = WydatexDatabase.getDatabase(getActivity()).getExpenseDao().findAll();
 
         expenseListAdapter = new ExpenseAdapter(getActivity(), expenses);
         recyclerView.setAdapter(expenseListAdapter);
@@ -59,7 +59,7 @@ public class ExpenseListFragment extends Fragment {
     }
 
     private void refreshAdapterData() {
-        List<Expense> expenses = ExpenseRepository.getAllExpenses(getActivity());
+        List<Expense> expenses = WydatexDatabase.getDatabase(getActivity()).getExpenseDao().findAll();
         expenseListAdapter.setExpenses(expenses);
         expenseListAdapter.notifyDataSetChanged();
     }

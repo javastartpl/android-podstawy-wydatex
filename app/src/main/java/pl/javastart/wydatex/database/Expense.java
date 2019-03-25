@@ -1,35 +1,34 @@
 package pl.javastart.wydatex.database;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverters;
 
 import pl.javastart.wydatex.expense.ExpenseCategory;
 
-@DatabaseTable(tableName = "expense")
+@Entity
 public class Expense {
 
-    @DatabaseField(generatedId = true)
+    @PrimaryKey(autoGenerate = true)
     private Long id;
 
-    @DatabaseField
     private String name;
 
-    @DatabaseField
     private double price;
 
-    @DatabaseField
     private String photoPath;
 
-    @DatabaseField
+    @TypeConverters(ExpenseCategoryConverter.class)
     private ExpenseCategory category;
 
-    @DatabaseField(foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
-    private Location location;
+    private Long locationId;
 
     @SuppressWarnings("unused")
     public Expense() {
     }
 
+    @Ignore
     public Expense(String name, double price, ExpenseCategory category, String photoPath) {
         this.name = name;
         this.price = price;
@@ -77,11 +76,11 @@ public class Expense {
         this.photoPath = photoPath;
     }
 
-    public Location getLocation() {
-        return location;
+    public Long getLocationId() {
+        return locationId;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
     }
 }

@@ -12,14 +12,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import pl.javastart.wydatex.R;
 import pl.javastart.wydatex.database.Location;
-import pl.javastart.wydatex.database.LocationRepository;
-import retrofit.RestAdapter;
+import pl.javastart.wydatex.database.WydatexDatabase;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class LocationListFragment extends Fragment {
 
@@ -34,7 +38,7 @@ public class LocationListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.recyclerview);
 
-        List<Location> locations = LocationRepository.findAll(getActivity());
+        List<Location> locations =WydatexDatabase.getDatabase(getActivity()).getLocationDao().findAll();
         adapter = new LocationAdapter(getActivity(), locations);
         recyclerView.setLayoutManager(new LinearLayoutManager(recyclerView.getContext()));
         recyclerView.setAdapter(adapter);
@@ -60,7 +64,7 @@ public class LocationListFragment extends Fragment {
     }
 
     private void updateList() {
-        List<Location> locations = LocationRepository.findAll(getActivity());
+        List<Location> locations = WydatexDatabase.getDatabase(getActivity()).getLocationDao().findAll();
         adapter.setLocations(locations);
         adapter.notifyDataSetChanged();
     }
@@ -70,23 +74,29 @@ public class LocationListFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint("http://przyklady.javastart.pl/ap")
+            Retrofit restAdapter = new Retrofit.Builder()
+                    .baseUrl("http://przyklady.javastart.pl/ap/")
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build();
 
             LocationWebService service = restAdapter.create(LocationWebService.class);
 
             boolean newDataAdded = false;
 
-            List<Location> locations = null;
+            List<Location> locations = new ArrayList<>();
 
             try {
-                locations = service.getAll();
+                Response<List<Location>> execute = service.getAll().execute();
+                locations = execute.body();
             } catch (RuntimeException e) {
-                e.printStackTrace();;
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
-            List<Location> databaseLocations = LocationRepository.findAll(getActivity());
+            List<Location> databaseLocations = WydatexDatabase.getDatabase(getActivity()).getLocationDao().findAll();
             Set<String> locationNames = new HashSet<>();
             for (Location databaseLocation : databaseLocations) {
                 locationNames.add(databaseLocation.getName());
@@ -94,7 +104,7 @@ public class LocationListFragment extends Fragment {
 
             for (Location location : locations) {
                 if (!locationNames.contains(location.getName())) {
-                    LocationRepository.insert(getActivity(), location);
+                    WydatexDatabase.getDatabase(getActivity()).getLocationDao().insert(location);
                     newDataAdded = true;
                 }
             }

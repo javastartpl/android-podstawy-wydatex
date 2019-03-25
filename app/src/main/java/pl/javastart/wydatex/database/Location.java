@@ -1,24 +1,20 @@
 package pl.javastart.wydatex.database;
 
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 
-@DatabaseTable
+@Entity
 public class Location {
 
-    @DatabaseField(generatedId = true)
+    @PrimaryKey(autoGenerate = true)
     private Long id;
 
-    @DatabaseField
     private String name;
 
-    @DatabaseField
     private double latitude;
 
-    @DatabaseField
     private double longitude;
 
-    @DatabaseField
     private float zoom;
 
     public Long getId() {
